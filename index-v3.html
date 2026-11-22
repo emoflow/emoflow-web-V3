@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EMOFLOW — Inteligencia Emocional Territorial</title>
+<meta name="description" content="EMOFLOW mide la saturación emocional de territorios y destinos antes de que colapse la infraestructura física. Modelos estocásticos transparentes, cero cajas negras.">
+<meta property="og:title" content="EMOFLOW — Inteligencia Emocional Territorial">
+<meta property="og:description" content="La fatiga emocional se anticipa al colapso físico. Medimos stock, no flujo.">
+<meta name="theme-color" content="#08161f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='44' fill='none' stroke='%233fd0c9' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='28' fill='none' stroke='%23ffb347' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='11' fill='%23ff5a4e'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08161f;--ink:#e9f1ec;--mute:#8fa9b3;--te:#3fd0c9;--am:#ffb347;--co:#ff5a4e;--gr:#7ee08f;--line:rgba(63,208,201,.25);--r:3px;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{font:400 17px/1.65 'IBM Plex Sans',system-ui,sans-serif;color:var(--ink);background:var(--bg);overflow-x:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+a{color:inherit}
+#field{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,nav,footer,header{position:relative;z-index:1}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+section{padding:92px 0;background:linear-gradient(rgba(8,22,31,.62),rgba(8,22,31,.62));border-top:1px solid var(--line)}
+h1,h2,h3{font-family:'Bricolage Grotesque',sans-serif;line-height:1.05;letter-spacing:-.025em}
+h1{font-size:clamp(3.2rem,11vw,7rem);font-weight:800}
+h2{font-size:clamp(2rem,5.4vw,3.4rem);font-weight:800;max-width:18ch;margin-bottom:20px}
+h3{font-size:1.25rem;font-weight:600;margin-bottom:8px;letter-spacing:-.01em}
+p.lead{color:var(--mute);max-width:60ch;font-size:1.08rem}
+.mono,.tag,.math{font-family:'IBM Plex Mono',monospace}
+.te{color:var(--te)}.am{color:var(--am)}
+.tag{font-size:.8rem;color:var(--te);display:block;margin-bottom:12px}
+.box{border:1px solid var(--line);background:rgba(8,22,31,.78);padding:24px;border-radius:var(--r);position:relative;backdrop-filter:blur(8px)}
+.box::before{content:"";position:absolute;left:-1px;top:-1px;width:36px;height:3px;background:var(--am)}
+.box p{color:var(--mute);font-size:.98rem}
+.grid{display:grid;gap:18px;margin-top:40px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+nav{position:fixed;inset:0 0 auto;background:rgba(8,22,31,.8);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top);z-index:50}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{font:800 1.2rem 'Bricolage Grotesque',sans-serif;letter-spacing:.02em;text-decoration:none;display:flex;gap:10px;align-items:center}
+.logo svg{width:24px;height:24px}
+.links{display:flex;gap:26px;align-items:center;font-size:.92rem}
+.links a{text-decoration:none;color:var(--mute);transition:color .2s}
+.links a:hover{color:var(--te)}
+.btn{display:inline-block;padding:13px 26px;background:var(--am);color:#1a0f00!important;font-weight:500;text-decoration:none;border-radius:var(--r);transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(255,179,71,.3)}
+.btn.o{background:transparent;color:var(--ink)!important;border:1px solid var(--line)}
+.links .btn{padding:8px 16px}
+.burger{display:none;background:0;border:1px solid var(--line);color:var(--ink);width:44px;height:40px;border-radius:var(--r);font-size:1.2rem}
+:focus-visible{outline:2px solid var(--am);outline-offset:3px}
+@media(max-width:820px){.burger{display:block}.links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;gap:0;background:var(--bg);border-bottom:1px solid var(--line);display:none}.links.open{display:flex}.links a{padding:16px 22px;border-top:1px solid var(--line)}.links .btn{margin:14px 22px;text-align:center}}
+.hero{min-height:100svh;display:flex;align-items:center;padding:110px 0 70px;background:radial-gradient(ellipse at 20% 50%,rgba(8,22,31,.85) 20%,rgba(8,22,31,0) 75%);border:0}
+.hero h1 span{display:block;font-weight:600;font-size:.4em;letter-spacing:-.01em;margin-top:16px;color:var(--te)}
+.hero p{margin:26px 0 34px;font-size:1.2rem;max-width:34ch}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.formula{position:absolute;right:22px;bottom:22px;font-size:.85rem;color:var(--mute)}
+@media(max-width:600px){.formula{display:none}}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:40px}
+@media(max-width:640px){.vs{grid-template-columns:1fr}}
+.vs .hot{border-color:rgba(255,90,78,.55);box-shadow:inset 0 0 70px rgba(255,90,78,.15)}
+.vs .cold{filter:saturate(.15)}
+.quote{margin-top:34px;padding:22px;border-left:4px solid var(--co);font:600 1.5rem/1.25 'Bricolage Grotesque',sans-serif;max-width:30ch}
+.sim{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;margin-top:40px;align-items:center}
+@media(max-width:760px){.sim{grid-template-columns:1fr}}
+.sim svg{width:100%;height:auto;display:block}
+.ctrl label{display:flex;justify-content:space-between;font-size:.9rem;color:var(--mute);margin:16px 0 6px}
+input[type=range]{width:100%;accent-color:var(--am);height:32px}
+.read{font:800 3.2rem/1 'Bricolage Grotesque',sans-serif}
+.pill{display:inline-block;padding:4px 12px;border-radius:99px;font-size:.82rem;font-weight:500;margin-top:10px}
+.chain{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));margin-top:40px}
+.chain .box{border-radius:0;margin:0 -1px -1px 0}
+.chain b{display:block;font:500 1.5rem 'IBM Plex Mono',monospace;color:var(--am);margin-bottom:6px}
+.bars{display:flex;gap:18px;align-items:flex-end;height:220px;margin:34px 0 8px}
+.bars div{flex:1;border-radius:3px 3px 0 0;position:relative;transition:height 1s cubic-bezier(.2,.8,.2,1)}
+.bars span{position:absolute;top:-28px;left:0;right:0;text-align:center;font:.95rem 'IBM Plex Mono',monospace}
+.cap{display:flex;gap:18px;font-size:.85rem;color:var(--mute);text-align:center}.cap div{flex:1}
+.zones{display:grid;gap:12px;margin-top:20px}
+.z{padding:14px 18px;border:1px solid;border-radius:var(--r);display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.z b{font-family:'IBM Plex Mono',monospace;min-width:7.5ch}
+.tw{overflow-x:auto;margin-top:36px;border:1px solid var(--line);border-radius:var(--r);background:rgba(8,22,31,.78)}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:16px 20px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-weight:500;color:var(--mute);font-size:.9rem}
+td:nth-child(2){color:var(--mute)}
+td:nth-child(3){font-weight:500;color:var(--te);background:rgba(63,208,201,.07)}
+tr:last-child>*{border:0}
+.math{font-size:.92rem;color:var(--te);overflow-x:auto;white-space:nowrap;padding:12px 0}
+.steps{display:grid;margin-top:36px;border-left:2px solid var(--te);margin-left:8px}
+.steps li{list-style:none;padding:0 0 28px 26px;position:relative}
+.steps li::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;background:var(--bg);border:2px solid var(--am);border-radius:50%}
+.vision{text-align:center}.vision h2{margin:0 auto 20px;max-width:20ch}.vision p.lead{margin:0 auto}
+.contact{text-align:center;background:linear-gradient(rgba(8,22,31,.5),rgba(255,90,78,.12))}
+.contact h2{margin:0 auto 18px}
+.mail{display:inline-block;font:500 clamp(1.05rem,4.6vw,1.9rem) 'IBM Plex Mono',monospace;color:var(--te);text-decoration:none;border-bottom:2px solid var(--am);padding:6px 0;margin:22px 0 28px;word-break:break-all}
+footer{padding:28px 0 calc(28px + env(safe-area-inset-bottom));border-top:1px solid var(--line);font-size:.85rem;color:var(--mute);text-align:center;background:var(--bg)}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+#cmd{display:none;position:fixed;left:0;right:0;bottom:0;top:calc(60px + env(safe-area-inset-top));z-index:40;background:#06060C;color:#e8e4d6;flex-direction:column;font:12px/1.5 'IBM Plex Mono',monospace}
+body.cmd #cmd{display:flex}body.cmd{overflow:hidden}
+#cmd .hud{display:flex;border-bottom:1px solid rgba(212,175,55,.3);overflow-x:auto;flex:none}
+#cmd .hud>div{padding:8px 14px;border-right:1px solid rgba(212,175,55,.18);white-space:nowrap}
+#cmd small{display:block;color:#8a8672;font-size:10px}
+#cmd .hud b{font-size:15px;color:#D4AF37;font-weight:500}
+#cmd .cm{flex:1;display:grid;grid-template-columns:1fr 310px;min-height:0}
+#mapw{position:relative;min-height:0}
+#map{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+#ro{position:absolute;left:10px;bottom:10px;background:rgba(6,6,12,.85);border:1px solid rgba(212,175,55,.3);padding:5px 10px;color:#b9b49f;pointer-events:none;font-size:11px;max-width:calc(100% - 20px)}
+#cmd .side{border-left:1px solid rgba(212,175,55,.3);overflow:auto;padding:14px;display:flex;flex-direction:column;gap:16px;background:#0a0a12}
+#cmd .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#cmd .cb{background:transparent;border:1px solid rgba(212,175,55,.35);color:#e8e4d6;padding:8px 10px;font:inherit;cursor:pointer;text-decoration:none;display:inline-block}
+#cmd .cb.on{background:#D4AF37;color:#120d00}
+#cmd .cb.go{border-color:#D4AF37;color:#D4AF37}
+#cmd .box{padding:10px;font-size:11.5px;background:#06060C;border-radius:0}#cmd .box::before{display:none}
+#cmd label{display:flex;justify-content:space-between;color:#b9b49f;margin-top:8px}
+#cmd input[type=range]{accent-color:#D4AF37;height:26px}
+#tp{display:none;position:absolute;top:10px;right:10px;z-index:2;background:rgba(6,6,12,.88)!important}
+@media(max-width:820px){#cmd .cm{display:flex;flex-direction:column}#mapw{flex:1 1 0;min-height:240px}#cmd .side{flex:none;border-left:0;border-top:1px solid rgba(212,175,55,.3);max-height:46vh}#cmd.sc .side{display:none}#tp{display:block}#cmd .hud>div{padding:6px 10px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="field" aria-hidden="true"></canvas>
+<nav>
+ <div class="wrap">
+  <a class="logo" href="#top"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="#3fd0c9" stroke-width="7"/><circle cx="50" cy="50" r="28" fill="none" stroke="#ffb347" stroke-width="7"/><circle cx="50" cy="50" r="11" fill="#ff5a4e"/></svg>EMOFLOW</a>
+  <button class="burger" aria-label="Abrir menú" aria-expanded="false">☰</button>
+  <div class="links">
+   <a href="#problema">El vacío</a><a href="#simulador">Modelo</a><a href="#productos">Productos</a><a href="#metricas">Métricas</a><a href="#motor">Motor</a>
+   <a class="btn o" href="#centro">Centro de mando</a><a class="btn" href="#contacto">Contacto</a>
+  </div>
+ </div>
+</nav>
+
+<header class="hero" id="top">
+ <div class="wrap">
+  <h1>EMOFLOW<span>Inteligencia Emocional Territorial</span></h1>
+  <p>Los territorios no colapsan primero por falta de infraestructura. Colapsan por sobrecarga emocional acumulada. Nosotros la medimos a tiempo.</p>
+  <div class="cta"><a class="btn" href="#contacto">Agendar conversación</a><a class="btn o" href="#simulador">Probar el modelo</a></div>
+ </div>
+ <div class="formula mono">S<sub>i</sub>(t) = 1 − e<sup>−μ·n<sub>i</sub></sup></div>
+</header>
+
+<main>
+<section id="problema">
+ <div class="wrap">
+  <h2 class="rv">Decisiones a ciegas</h2>
+  <p class="lead rv">Hoy la estabilidad se mide con PIB, aforo y riesgo estructural. La inestabilidad real emerge en otra dimensión, y entre ambas hay una brecha sistémica.</p>
+  <div class="vs rv">
+   <div class="box cold"><span class="tag">Perspectiva tradicional</span><h3>Estabilidad monocromática</h3><p>Se mide lo económico y lo físico. Se cuenta gente, tránsito y exposición. Sin stock no hay saturación: solo conteo.</p></div>
+   <div class="box hot"><span class="tag">La realidad</span><h3>Presión emocional oculta</h3><p>Acumulación social, fatiga sistémica y puntos de ruptura que ningún indicador clásico registra hasta que ya es tarde.</p></div>
+  </div>
+  <p class="quote rv">La fatiga emocional se anticipa al colapso físico.</p>
+ </div>
+</section>
+
+<section id="simulador">
+ <div class="wrap">
+  <span class="tag">Stock vs. flujo</span>
+  <h2 class="rv">Modelamos la capacidad, no el conteo</h2>
+  <p class="lead rv">Cada territorio tiene una capacidad experiencial efectiva que se pierde con la exposición acumulada. La saturación es la pérdida de ese stock. Mueve los controles y mira por qué la acumulación lineal no puede ser correcta.</p>
+  <div class="sim box rv">
+   <svg viewBox="0 0 400 240" role="img" aria-label="Curva de saturación exponencial frente a acumulación lineal">
+    <g stroke="rgba(63,208,201,.18)"><path d="M40 20H380M40 80H380M40 140H380M40 200H380"/></g>
+    <path d="M40 20V200H380" fill="none" stroke="#3fd0c9" stroke-width="1.5"/>
+    <line x1="40" x2="380" y1="38" y2="38" stroke="#ff5a4e" stroke-dasharray="4 4" opacity=".6"/>
+    <text x="378" y="32" fill="#ff5a4e" font-size="10" text-anchor="end" font-family="IBM Plex Mono">colapso: τ</text>
+    <path id="lin" fill="none" stroke="#8fa9b3" stroke-width="2" stroke-dasharray="5 4"/>
+    <path id="exp" fill="none" stroke="#ffb347" stroke-width="3"/>
+    <circle id="dot" r="6" fill="#3fd0c9"/>
+    <text x="210" y="226" fill="#8fa9b3" font-size="11" text-anchor="middle" font-family="IBM Plex Mono">exposición acumulada n</text>
+    <text x="300" y="156" fill="#8fa9b3" font-size="10" font-family="IBM Plex Mono">lineal (imposible)</text>
+    <text x="300" y="66" fill="#ffb347" font-size="10" font-family="IBM Plex Mono">EMOFLOW</text>
+   </svg>
+   <div class="ctrl">
+    <div class="mono" style="color:var(--mute);font-size:.85rem">Saturación S = 1 − e<sup>−μn</sup></div>
+    <div class="read" id="rd">0.00</div><span class="pill" id="pl"></span>
+    <label for="n">Exposición n <b id="nv"></b></label><input id="n" type="range" min="0" max="10" step="0.1" value="3">
+    <label for="m">Sensibilidad μ <b id="mv"></b></label><input id="m" type="range" min="0.1" max="1" step="0.05" value="0.4">
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="arquitectura">
+ <div class="wrap">
+  <span class="tag">Arquitectura</span>
+  <h2 class="rv">De la experiencia al territorio</h2>
+  <div class="chain rv">
+   <div class="box"><b>UE</b><h3>Unidad de Experiencia</h3><p>Interacción mínima y significativa.</p></div>
+   <div class="box"><b>NE</b><h3>Nodo Emocional</h3><p>Punto físico de impacto medible.</p></div>
+   <div class="box"><b>CEL</b><h3>Campo Emocional Local</h3><p>Impacto sobre el entorno inmediato.</p></div>
+   <div class="box"><b>CET</b><h3>Campo Emocional Territorial</h3><p>La superposición dinámica: el territorio como un continuo emocional.</p></div>
+  </div>
+  <div class="grid g2">
+   <div class="box rv"><h3>Vectorización</h3><p>Cada experiencia es un vector con valencia (calidad), activación (intensidad) y significado (relevancia simbólica).</p><div class="math">E(t+1) = E(t) · e^(−λd)</div></div>
+   <div class="box rv"><h3>Decaimiento espacial</h3><p>La emoción no desaparece al instante: decae durante los traslados. Eso revela rutas agotadoras y zonas de recuperación.</p></div>
+  </div>
+ </div>
+</section>
+
+<section id="productos">
+ <div class="wrap">
+  <span class="tag">Un núcleo matemático, dos despliegues</span>
+  <h2 class="rv">Dos productos, un mismo motor</h2>
+  <div class="grid g2">
+   <article class="box rv"><h3 class="am">EMOFLOW Journey®</h3><p><b style="color:var(--ink);font-weight:500">Turismo y experiencias.</b> Optimiza la secuencia del visitante y anticipa la fatiga del destino con circuitos alternativos diseñados con datos, no con prohibiciones.</p></article>
+   <article class="box rv"><h3 class="te">EMOFLOW Territory®</h3><p><b style="color:var(--ink);font-weight:500">Ciudad y urbanismo.</b> Gestiona la equidad emocional y mide el estrés crónico del habitante: nodos identitarios saturados, infraestructura frágil y redistribución hacia nodos con potencial latente.</p></article>
+  </div>
+ </div>
+</section>
+
+<section id="metricas">
+ <div class="wrap">
+  <span class="tag">Métricas centrales</span>
+  <h2 class="rv">No cuentan turistas, miden desgaste</h2>
+  <div class="grid g2">
+   <div class="box rv">
+    <h3>ISTE</h3><p>Índice de Saturación Turística Emocional: cuánto impacto soporta un área frente a su capacidad óptima.</p>
+    <div class="zones">
+     <div class="z" style="border-color:var(--gr)"><b style="color:var(--gr)">&lt; 0.60</b><span>Saludable: monitoreo estándar.</span></div>
+     <div class="z" style="border-color:var(--am)"><b style="color:var(--am)">0.60–0.85</b><span>En tensión: reducir estímulos, rediseñar rutas.</span></div>
+     <div class="z" style="border-color:var(--co)"><b style="color:var(--co)">&gt; 0.85</b><span>Sobrecarga: activar desvíos y alertas tempranas.</span></div>
+    </div>
+   </div>
+   <div class="box rv">
+    <h3>IRET</h3><p>Índice de Riesgo y Redistribución Emocional: mide si el impacto se reparte con equidad entre barrios. Cercano a 1, el territorio es resiliente; bajo o negativo, hay concentración y estrés crónico.</p>
+    <div class="math">IRET = 1 − σ(CET) / μ(CET)</div>
+    <div class="bars" id="bars" aria-label="IRET en tres escenarios">
+     <div data-h="45" style="background:linear-gradient(#b6f08a,var(--gr))"><span>0.304</span></div>
+     <div data-h="70" style="background:linear-gradient(#ffd98a,var(--am))"><span>0.337</span></div>
+     <div data-h="100" style="background:linear-gradient(var(--co),#7a1f2a)"><span>0.361</span></div>
+    </div>
+    <div class="cap"><div>Base</div><div>Temporada</div><div>Extremo</div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section id="motor">
+ <div class="wrap">
+  <span class="tag">Motor predictivo</span>
+  <h2 class="rv">Cero cajas negras</h2>
+  <p class="lead rv">EMOFLOW no predice emociones individuales. Mide estados agregados emergentes de la interacción humano-territorio, sin invadir la privacidad.</p>
+  <div class="grid g3">
+   <div class="box rv"><span class="tag">Pilar 1</span><h3>Módulo OSINT</h3><p>Captura señales públicas y conductuales: movilidad, discursos y eventos.</p></div>
+   <div class="box rv"><span class="tag">Pilar 2</span><h3>Modelos de espacio de estados</h3><p>Motor estocástico no lineal con volatilidad endógena y umbrales críticos.</p></div>
+   <div class="box rv"><span class="tag">Pilar 3</span><h3>Simulación paramétrica</h3><p>Escenarios probabilísticos y validación Monte Carlo.</p></div>
+  </div>
+  <div class="grid g2" style="margin-top:18px">
+   <div class="box rv"><h3>Rigor demostrable</h3><p>Estabilidad exponencial global, acoplamiento en red, bifurcación transcrítica en el punto de paridad exposición-recuperación y estabilidad en media cuadrática, todo derivado analíticamente.</p><div class="math">dEᵢ/dt = −μuᵢEᵢ + ρᵢ(Eᵢᵐᵃˣ − Eᵢ)</div></div>
+   <div class="box rv"><h3>Mapas canónicos</h3><p><b style="color:var(--ink);font-weight:500">Campo emocional</b> para diagnóstico. <b style="color:var(--ink);font-weight:500">Flujo emocional</b> para diseño de recorridos. <b style="color:var(--ink);font-weight:500">Saturación y redistribución</b> para política pública.</p></div>
+  </div>
+ </div>
+</section>
+
+<section id="gobernanza">
+ <div class="wrap">
+  <span class="tag">Gobernanza por ingeniería inversa</span>
+  <h2 class="rv">De prueba y error a diseño paramétrico</h2>
+  <ol class="steps rv">
+   <li><h3>Define el objetivo</h3><p class="lead">Por ejemplo, reducir el IRET en un 30%.</p></li>
+   <li><h3>El motor resuelve hacia atrás</h3><p class="lead">Parte del estado deseado y calcula qué debe cambiar.</p></li>
+   <li><h3>Recibes la configuración exacta</h3><p class="lead">Dónde ubicar N nodos y qué flujos desviar.</p></li>
+  </ol>
+  <div class="tw rv"><table>
+   <thead><tr><th></th><th>Enfoque tradicional</th><th>EMOFLOW</th></tr></thead>
+   <tbody>
+    <tr><th>Variable</th><td>Capacidad física (aforo)</td><td>Capacidad emocional (stock)</td></tr>
+    <tr><th>Horizonte</th><td>Medición ex post, al colapso</td><td>Detección temprana</td></tr>
+    <tr><th>Gestión</th><td>Regulación administrativa: prohibir</td><td>Gobernanza basada en riesgo: redistribuir</td></tr>
+    <tr><th>Diseño</th><td>Prueba y error</td><td>Ingeniería inversa</td></tr>
+   </tbody></table></div>
+ </div>
+</section>
+
+<section class="vision" id="vision">
+ <div class="wrap">
+  <span class="tag">Visión 2030</span>
+  <h2 class="rv">Hacia la norma ISO-EMO</h2>
+  <p class="lead rv">Trabajamos para que el análisis emocional territorial sea parte de los planes maestros urbanos. El bienestar humano no es un efecto colateral: es una infraestructura calculable.</p>
+ </div>
+</section>
+
+<section class="contact" id="contacto">
+ <div class="wrap">
+  <h2 class="rv">Midamos tu territorio</h2>
+  <p class="lead rv" style="margin:0 auto">Cuéntanos qué destino o ciudad quieres entender y te respondemos con una propuesta.</p>
+  <a class="mail rv" href="mailto:atem.emoflow@gmail.com?subject=Consulta%20EMOFLOW">atem.emoflow@gmail.com</a><br>
+  <a class="btn rv" href="mailto:atem.emoflow@gmail.com?subject=Consulta%20EMOFLOW">Escribir ahora</a>
+ </div>
+</section>
+</main>
+
+<div id="cmd" role="region" aria-label="Centro de mando territorial">
+ <div class="hud">
+  <div><small>EMOFLOW</small><b style="color:#fff">CENTRO DE MANDO</b></div>
+  <div><small>ZULU</small><b id="zl">--:--:--Z</b></div>
+  <div><small>ESTADO</small><b>SIMULACIÓN</b></div>
+  <div><small>CAPAS</small><b id="nl">4</b></div>
+  <div><small>NODOS</small><b>12</b></div>
+  <div><small>ISTE</small><b id="iste">–</b></div>
+  <div><small>IRET</small><b id="iret">–</b></div>
+  <div style="margin-left:auto"><a class="cb" href="#top">✕ Volver al sitio</a></div>
+ </div>
+ <div class="cm">
+  <div id="mapw"><canvas id="map"></canvas><button class="cb" id="tp" type="button" aria-expanded="false">Controles</button><div id="ro"></div></div>
+  <aside class="side">
+   <div><small>CAPAS</small><div class="row">
+    <button class="cb on" data-l="f">Campo emocional</button><button class="cb on" data-l="w">Flujos</button><button class="cb on" data-l="n">Nodos</button><button class="cb on" data-l="r">Redistribución</button></div></div>
+   <div><small>ESCENARIO</small><div class="row">
+    <button class="cb on" data-x="1">Base</button><button class="cb" data-x="1.5">Temporada</button><button class="cb" data-x="2.1">Extremo</button></div>
+    <label for="ex">Exposición ×<b id="exv"></b></label><input id="ex" type="range" min="0.4" max="2.4" step="0.05" value="1">
+    <label for="mu">Sensibilidad μ<b id="muv"></b></label><input id="mu" type="range" min="0.1" max="0.8" step="0.05" value="0.35"></div>
+   <div><small>INGENIERÍA INVERSA</small><div class="row">
+    <button class="cb go" id="solve">Resolver: −30% desequilibrio</button><button class="cb" id="rst">Reiniciar</button></div>
+    <div class="box" id="log" style="margin-top:8px">Define el objetivo y el motor calcula qué cargas desviar. Se redistribuye, no se prohíbe.</div></div>
+   <div><small>NODO SELECCIONADO</small><div class="box" id="sel" style="margin-top:6px"></div></div>
+   <p style="color:#8a8672;font-size:10.5px">Datos sintéticos de demostración. El motor real usa señales OSINT agregadas del territorio, sin datos individuales.</p>
+  </aside>
+ </div>
+</div>
+
+<footer><div class="wrap">EMOFLOW Framework® · Architect of Territorial Emotional Metrics (A.T.E.M.) · © <span id="y"></span></div></footer>
+
+<script>
+(function(){
+ var $=function(s){return document.querySelector(s)},rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+ var bt=$('.burger'),l=$('.links');
+ bt.onclick=function(){var o=l.classList.toggle('open');bt.setAttribute('aria-expanded',o)};
+ l.onclick=function(e){if(e.target.tagName=='A'){l.classList.remove('open');bt.setAttribute('aria-expanded',false)}};
+ $('#y').textContent=new Date().getFullYear();
+ var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+ document.querySelectorAll('.rv').forEach(function(e){io.observe(e)});
+ var bars=document.querySelectorAll('#bars div');
+ bars.forEach(function(d){d.style.height='0'});
+ new IntersectionObserver(function(es,o){if(es[0].isIntersecting){bars.forEach(function(d){d.style.height=d.dataset.h+'%'});o.disconnect()}},{threshold:.4}).observe($('#bars'));
+ // simulador
+ var n=$('#n'),m=$('#m');
+ function sim(){
+  var N=+n.value,mu=+m.value,P=[],L=[],x0=40,w=340,y0=200,h=162;
+  for(var i=0;i<=60;i++){var t=i/60*10,s=1-Math.exp(-mu*t),X=x0+i/60*w;P.push((i?'L':'M')+X+' '+(y0-s*h));L.push((i?'L':'M')+X+' '+(y0-Math.min(1.25,mu*t)*h))}
+  $('#exp').setAttribute('d',P.join(''));$('#lin').setAttribute('d',L.join(''));
+  var S=1-Math.exp(-mu*N);
+  $('#dot').setAttribute('cx',x0+N/10*w);$('#dot').setAttribute('cy',y0-S*h);
+  $('#rd').textContent=S.toFixed(2);$('#nv').textContent=N.toFixed(1);$('#mv').textContent=mu.toFixed(2);
+  var p=$('#pl'),c=S<.6?['#7ee08f','Saludable']:S<=.85?['#ffb347','En tensión']:['#ff5a4e','Sobrecarga'];
+  p.textContent=c[1];p.style.background=c[0];p.style.color='#10140f';$('#rd').style.color=c[0];
+ }
+ n.oninput=m.oninput=sim;sim();
+ // campo emocional territorial: curvas de nivel de la superposición de nodos
+ var cv=$('#field'),cx=cv.getContext('2d'),W,H,cs,gw,gh,V,nodes=[],T=0;
+ var LV=[.1,.18,.27,.37,.48,.6,.72,.85];
+ function rs(){var d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;cx.setTransform(d,0,0,d,0,0);cs=W<700?20:14;gw=Math.ceil(W/cs)+1;gh=Math.ceil(H/cs)+1;V=new Float32Array(gw*gh)}
+ rs();addEventListener('resize',function(){rs();if(rm)draw()});
+ for(var i=0;i<9;i++)nodes.push({x:Math.random(),y:Math.random(),s:.07+Math.random()*.1,k:.5+Math.random()*.6,a:Math.random()*6.28,v:.0004+Math.random()*.0006});
+ function col(t,a){var r,g,b;if(t<.5){var u=t*2;r=63+(255-63)*u;g=208+(179-208)*u;b=201+(71-201)*u}else{var u=(t-.5)*2;r=255;g=179+(90-179)*u;b=71+(78-71)*u}return'rgba('+(r|0)+','+(g|0)+','+(b|0)+','+a+')'}
+ function draw(){
+  if(document.body.classList.contains('cmd')){if(!rm)requestAnimationFrame(draw);return}
+  var D=Math.max(W,H),i,j,k;
+  for(k=0;k<nodes.length;k++){var o=nodes[k];o.a+=o.v;o._x=(o.x+Math.cos(o.a)*.07)*W;o._y=(o.y+Math.sin(o.a*1.3)*.07)*H;o._s=o.s*D;o._q=1/(2*o._s*o._s)}
+  for(j=0;j<gh;j++)for(i=0;i<gw;i++){var x=i*cs,y=j*cs,v=0;for(k=0;k<nodes.length;k++){var o=nodes[k],dx=x-o._x,dy=y-o._y;v+=o.k*Math.exp(-(dx*dx+dy*dy)*o._q)}V[j*gw+i]=v}
+  cx.clearRect(0,0,W,H);cx.lineWidth=1.2;
+  LV.forEach(function(L,li){
+   cx.beginPath();
+   for(j=0;j<gh-1;j++)for(i=0;i<gw-1;i++){
+    var a=V[j*gw+i],b=V[j*gw+i+1],c=V[(j+1)*gw+i+1],d=V[(j+1)*gw+i],x0=i*cs,y0=j*cs;
+    var ix=(a>L?8:0)|(b>L?4:0)|(c>L?2:0)|(d>L?1:0);
+    if(ix==0||ix==15)continue;
+    var E=[function(){return[x0+cs*(L-a)/(b-a),y0]},function(){return[x0+cs,y0+cs*(L-b)/(c-b)]},function(){return[x0+cs*(L-d)/(c-d),y0+cs]},function(){return[x0,y0+cs*(L-a)/(d-a)]}];
+    var S={1:[3,2],2:[2,1],3:[3,1],4:[0,1],5:[3,0,2,1],6:[0,2],7:[3,0],8:[3,0],9:[0,2],10:[0,1,3,2],11:[0,1],12:[3,1],13:[2,1],14:[3,2]}[ix];
+    for(k=0;k<S.length;k+=2){var p=E[S[k]](),q=E[S[k+1]]();cx.moveTo(p[0],p[1]);cx.lineTo(q[0],q[1])}
+   }
+   cx.strokeStyle=col(li/(LV.length-1),.28+li*.07);cx.stroke();
+  });
+  if(!rm){T++;requestAnimationFrame(draw)}
+ }
+ draw();
+})();
+</script>
+<script>
+(function(){
+ var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)},rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+ var D=[["Centro histórico",.5,.45,3.4,1.2],["Plaza mayor",.37,.34,2.6,1.1],["Mercado",.62,.3,2.8,1],["Puerto",.17,.5,2.3,1.1],["Costanera",.3,.7,1.9,.9],["Estación",.74,.55,2.2,1],["Mirador",.84,.27,1.5,1.3],["Barrio alto",.87,.7,.9,1.2],["Universidad",.55,.72,1.3,.9],["Parque",.43,.88,.5,.8],["Terminal",.12,.24,1.4,1],["Caleta",.1,.8,.8,1.1]];
+ var N=D.map(function(d){return{nm:d[0],x:d[1],y:d[2],n0:d[3],k:d[4],n:d[3],t:d[3]}});
+ var st={ex:1,mu:.35,L:{f:1,w:1,n:1,r:1},sel:N[0],cur:null},cv=$('#map'),c=cv.getContext('2d'),W=1,H=1,run=0;
+ function S(o,n){return 1-Math.exp(-st.mu*o.k*(n==null?o.n:n)*st.ex)}
+ function arr(ns){return N.map(function(o,i){return S(o,ns?ns[i]:null)})}
+ function cvOf(a){var m=a.reduce(function(s,v){return s+v},0)/a.length,sd=Math.sqrt(a.reduce(function(s,v){return s+(v-m)*(v-m)},0)/a.length);return{m:m,c:sd/m}}
+ var E=[],seen={};
+ N.forEach(function(a,i){N.map(function(b,j){return[j,Math.hypot(a.x-b.x,a.y-b.y)]}).filter(function(p){return p[0]!=i}).sort(function(p,q){return p[1]-q[1]}).slice(0,2).forEach(function(p){var k=Math.min(i,p[0])+'-'+Math.max(i,p[0]);if(!seen[k]){seen[k]=1;E.push([i,p[0]])}})});
+ function col(s,a){var A=[63,208,160],B=[212,175,55],C=[255,70,60],u,f,g;if(s<.6){u=s/.6;f=A;g=B}else{u=Math.min(1,(s-.6)/.4);f=B;g=C}return'rgba('+f.map(function(v,i){return Math.round(v+(g[i]-v)*u)}).join(',')+','+a+')'}
+ function zc(v){return v<.6?'#3fd0a0':v<=.85?'#D4AF37':'#ff4636'}
+ var bg=document.createElement('canvas');
+ function mk(d){
+  var g,y,i,k,a,L=Math.hypot(W,H),co=function(v){return(.06+.04*Math.sin(v*6)+.015*Math.sin(v*19))*W};
+  bg.width=W*d;bg.height=H*d;g=bg.getContext('2d');g.setTransform(d,0,0,d,0,0);
+  g.fillStyle='#06060C';g.fillRect(0,0,W,H);
+  var sea=g.createLinearGradient(0,0,W*.15,0);sea.addColorStop(0,'#06182a');sea.addColorStop(1,'#0c2438');
+  g.fillStyle=sea;g.beginPath();g.moveTo(0,0);for(y=0;y<=H;y+=6)g.lineTo(co(y/H),y);g.lineTo(0,H);g.fill();
+  for(k=1;k<4;k++){g.strokeStyle='rgba(80,170,220,'+(.24-k*.06)+')';g.lineWidth=1;g.beginPath();for(y=0;y<=H;y+=6)g[y?'lineTo':'moveTo'](co(y/H)-k*9,y);g.stroke()}
+  g.save();g.beginPath();for(y=0;y<=H;y+=6)g[y?'lineTo':'moveTo'](co(y/H),y);g.lineTo(W,H);g.lineTo(W,0);g.closePath();g.clip();
+  g.fillStyle='#0c0e18';g.fillRect(0,0,W,H);
+  [[.35,22,.1],[-.7,64,.1]].forEach(function(q){g.save();g.translate(W/2,H/2);g.rotate(q[0]);g.strokeStyle='rgba(200,190,150,'+q[2]+')';g.lineWidth=1;g.beginPath();for(i=-L;i<L;i+=q[1]){g.moveTo(i,-L);g.lineTo(i,L);g.moveTo(-L,i);g.lineTo(L,i)}g.stroke();g.restore()});
+  g.fillStyle='rgba(63,208,160,.08)';[[.43,.88,.07],[.84,.27,.06],[.55,.72,.04]].forEach(function(p){g.beginPath();g.arc(p[0]*W,p[1]*H,p[2]*Math.min(W,H)*1.6,0,6.3);g.fill()});
+  [[.85,.2],[.62,.92],[.8,.64]].forEach(function(p,h){for(var r=24;r<190;r+=24){g.strokeStyle='rgba(63,208,160,'+(.22-r/1200)+')';g.beginPath();for(a=0;a<=6.4;a+=.1){var rr=r*(1+.14*Math.sin(3*a+h)+.08*Math.sin(5*a+2*h));g[a?'lineTo':'moveTo'](p[0]*W+rr*Math.cos(a),p[1]*H+rr*Math.sin(a))}g.stroke()}});
+  g.strokeStyle='rgba(212,175,55,.3)';g.lineWidth=2.4;g.beginPath();E.forEach(function(e){g.moveTo(N[e[0]].x*W,N[e[0]].y*H);g.lineTo(N[e[1]].x*W,N[e[1]].y*H)});g.stroke();
+  g.lineWidth=1.6;g.strokeStyle='rgba(212,175,55,.2)';g.beginPath();g.ellipse(.5*W,.5*H,.3*W,.28*H,.2,0,6.3);g.stroke();
+  g.restore();
+  g.strokeStyle='rgba(120,200,240,.55)';g.lineWidth=1.6;g.beginPath();for(y=0;y<=H;y+=6)g[y?'lineTo':'moveTo'](co(y/H),y);g.stroke();
+  g.fillStyle='rgba(120,200,240,.4)';g.font='10px IBM Plex Mono,monospace';g.fillText('MAR',10,H*.5);
+ }
+ function size(){var d=Math.min(devicePixelRatio||1,2),r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*d;cv.height=H*d;c.setTransform(d,0,0,d,0,0);if(W>10)mk(d)}
+ new ResizeObserver(size).observe($('#mapw'));
+ function draw(t){
+  if(!document.body.classList.contains('cmd')){run=0;return}
+  requestAnimationFrame(draw);
+  var s=arr(),i,u=Math.min(W,H),m=cvOf(s),sd=m.c*m.m;
+  N.forEach(function(o){o.n+=(o.t-o.n)*.07});
+  c.clearRect(0,0,W,H);if(bg.width)c.drawImage(bg,0,0,W,H);
+  if(st.L.f){c.globalCompositeOperation='lighter';N.forEach(function(o,j){var x=o.x*W,y=o.y*H,R=u*(.1+.22*s[j]),g=c.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,col(s[j],.55));g.addColorStop(1,col(s[j],0));c.fillStyle=g;c.fillRect(x-R,y-R,2*R,2*R)});c.globalCompositeOperation='source-over'}
+  if(st.L.w)E.forEach(function(e,k){var a=N[e[0]],b=N[e[1]],sa=s[e[0]],sb=s[e[1]],hi=sa>=sb?a:b,lo=sa>=sb?b:a,d=Math.abs(sa-sb);c.strokeStyle='rgba(212,175,55,.18)';c.lineWidth=1;c.beginPath();c.moveTo(a.x*W,a.y*H);c.lineTo(b.x*W,b.y*H);c.stroke();for(var q=0;q<3;q++){var p=((rm?0:t||0)*.00012*(.5+d*5)+q/3+k*.17)%1;c.fillStyle='rgba(255,236,170,'+(.9*(1-p))+')';c.beginPath();c.arc((hi.x+(lo.x-hi.x)*p)*W,(hi.y+(lo.y-hi.y)*p)*H,2.2,0,6.3);c.fill()}});
+  N.forEach(function(o,j){var x=o.x*W,y=o.y*H,sj=s[j];
+   if(st.L.r){if(sj>m.m+.5*sd){c.strokeStyle='#ff4636';c.lineWidth=1.5;c.beginPath();c.moveTo(x-24,y);c.lineTo(x-13,y);c.moveTo(x+13,y);c.lineTo(x+24,y);c.moveTo(x,y-24);c.lineTo(x,y-13);c.moveTo(x,y+13);c.lineTo(x,y+24);c.stroke()}else if(sj<m.m-.5*sd){c.strokeStyle='#3fd0a0';c.lineWidth=1.5;c.setLineDash([3,4]);c.beginPath();c.arc(x,y,21,0,6.3);c.stroke();c.setLineDash([])}}
+   if(st.L.n){c.strokeStyle=col(sj,.9);c.lineWidth=1.5;c.beginPath();c.arc(x,y,7+sj*9,0,6.3);c.stroke();c.fillStyle='#fff';c.beginPath();c.arc(x,y,2.5,0,6.3);c.fill();c.fillStyle='rgba(232,228,214,.85)';c.font='11px IBM Plex Mono,monospace';c.textAlign='center';c.fillText(o.nm,x,y+28)}
+   if(o===st.sel){c.strokeStyle='#D4AF37';c.lineWidth=1.5;c.strokeRect(x-18,y-18,36,36)}});
+  $('#iste').textContent=m.m.toFixed(2);$('#iste').style.color=zc(m.m);$('#iret').textContent=(1-m.c).toFixed(3);
+  var j=N.indexOf(st.sel),v=s[j];
+  $('#sel').innerHTML='<b style="color:#fff">'+st.sel.nm+'</b><br>S = '+v.toFixed(2)+' · n = '+st.sel.n.toFixed(2)+'<br><span style="color:'+zc(v)+'">'+(v<.6?'Saludable: monitoreo estándar.':v<=.85?'En tensión: reducir estímulos, rediseñar rutas.':'Sobrecarga: activar desvíos y alertas tempranas.')+'</span>';
+  if(st.cur){var f=1,sg=.12*u;N.forEach(function(o,k){var dx=st.cur.x-o.x*W,dy=st.cur.y-o.y*H;f*=1-s[k]*Math.exp(-(dx*dx+dy*dy)/(2*sg*sg))});$('#ro').textContent='CURSOR '+(st.cur.x/W).toFixed(2)+', '+(st.cur.y/H).toFixed(2)+' · CAMPO LOCAL '+(1-f).toFixed(2)}
+  else $('#ro').textContent='CURSOR — · TOCA UN NODO PARA VER SU DETALLE';
+ }
+ function pt(e){var r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+ cv.addEventListener('pointermove',function(e){st.cur=pt(e)});
+ cv.addEventListener('pointerleave',function(){st.cur=null});
+ cv.addEventListener('click',function(e){var p=pt(e),b=null,bd=34;N.forEach(function(o){var d=Math.hypot(p.x-o.x*W,p.y-o.y*H);if(d<bd){bd=d;b=o}});if(b)st.sel=b});
+ $$('[data-l]').forEach(function(b){b.onclick=function(){var k=b.dataset.l;st.L[k]=st.L[k]?0:1;b.classList.toggle('on');$('#nl').textContent=Object.keys(st.L).filter(function(q){return st.L[q]}).length}});
+ var ex=$('#ex'),mu=$('#mu');
+ function ctl(){st.ex=+ex.value;st.mu=+mu.value;$('#exv').textContent=st.ex.toFixed(2);$('#muv').textContent=st.mu.toFixed(2)}
+ ex.oninput=function(){$$('[data-x]').forEach(function(b){b.classList.remove('on')});ctl()};mu.oninput=ctl;ctl();
+ $$('[data-x]').forEach(function(b){b.onclick=function(){$$('[data-x]').forEach(function(q){q.classList.remove('on')});b.classList.add('on');ex.value=b.dataset.x;ctl()}});
+ $('#solve').onclick=function(){
+  var s0=cvOf(arr()),tg=s0.c*.7,tot=0,f,tn;N.forEach(function(o){tot+=o.n});var mn=tot/N.length;
+  for(f=1;f>0;f-=.02){tn=N.map(function(o){return mn+(o.n-mn)*f});if(cvOf(arr(tn)).c<=tg)break}
+  if(f<=0)tn=N.map(function(){return mn});
+  var mv=N.map(function(o,i){return{o:o,p:(tn[i]-o.n)/o.n*100}}).sort(function(a,b){return a.p-b.p});
+  N.forEach(function(o,i){o.t=tn[i]});
+  var nm=function(a,sg){return a.map(function(x){return x.o.nm+' ('+sg+Math.abs(x.p).toFixed(0)+'%)'}).join(', ')};
+  $('#log').innerHTML='<b style="color:#D4AF37">Resuelto hacia atrás</b> · IRET '+(1-s0.c).toFixed(3)+' → '+(1-cvOf(arr(tn)).c).toFixed(3)+'<br>Desviar carga desde '+nm(mv.slice(0,2),'−')+' hacia '+nm(mv.slice(-2).reverse(),'+')+'.'};
+ $('#rst').onclick=function(){N.forEach(function(o){o.t=o.n0});$('#log').textContent='Define el objetivo y el motor calcula qué cargas desviar. Se redistribuye, no se prohíbe.'};
+ if(innerWidth<=820)$('#cmd').classList.add('sc');
+ $('#tp').onclick=function(){var o=$('#cmd').classList.toggle('sc');this.setAttribute('aria-expanded',!o);this.textContent=o?'Controles':'Ocultar'};
+ setInterval(function(){$('#zl').textContent=new Date().toISOString().substr(11,8)+'Z'},1000);
+ function hs(){var o=location.hash=='#centro';document.body.classList.toggle('cmd',o);if(o&&!run){run=1;requestAnimationFrame(draw)}}
+ addEventListener('hashchange',hs);hs();
+})();
+</script>
+</body>
+</html>
